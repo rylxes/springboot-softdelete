@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.rylxes</groupId>
+    <groupId>io.github.rylxes</groupId>
     <artifactId>spring-boot-softdelete</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>Spring Boot Soft Delete</name>
     <description>Laravel-style soft delete for Spring Boot JPA — database agnostic, plug-and-play</description>
-    <url>https://github.com/rylxes/spring-boot-softdelete</url>
+    <url>https://github.com/rylxes/springboot-softdelete</url>
 
     <licenses>
         <license>
@@ -24,8 +24,16 @@
         <developer>
             <id>rylxes</id>
             <name>rylxes</name>
+            <url>https://github.com/rylxes</url>
         </developer>
     </developers>
+
+    <!-- Required: SCM info -->
+    <scm>
+        <connection>scm:git:git://github.com/rylxes/springboot-softdelete.git</connection>
+        <developerConnection>scm:git:ssh://github.com:rylxes/springboot-softdelete.git</developerConnection>
+        <url>https://github.com/rylxes/springboot-softdelete</url>
+    </scm>
 
     <properties>
         <java.version>17</java.version>
@@ -96,7 +104,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Attach sources jar -->
+            <!-- Attach sources jar (required for Central) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -109,7 +117,7 @@
                 </executions>
             </plugin>
 
-            <!-- Attach javadoc jar -->
+            <!-- Attach javadoc jar (required for Central) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -120,6 +128,33 @@
                         <goals><goal>jar</goal></goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- GPG signing (required for Central) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals><goal>sign</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Publish to Maven Central via Central Portal -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.6.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>published</waitUntil>
+                </configuration>
             </plugin>
 
             <!-- Surefire for tests -->
