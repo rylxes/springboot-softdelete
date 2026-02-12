@@ -61,15 +61,13 @@ ok()    { echo -e "${GREEN}✔${NC} $1"; }
 warn()  { echo -e "${YELLOW}⚠${NC} $1"; }
 fail()  { echo -e "${RED}✘${NC} $1"; exit 1; }
 
-# ── Resolve Java ──────────────────────────────────────────────
-if [ -z "$JAVA_HOME" ]; then
-    JAVA_HOME=$(/usr/libexec/java_home 2>/dev/null || echo "")
-    if [ -z "$JAVA_HOME" ]; then
-        JAVA_HOME="$HOME/Library/Java/JavaVirtualMachines/azul-17.0.13/Contents/Home"
-    fi
-    export JAVA_HOME
-    export PATH="$JAVA_HOME/bin:$PATH"
+# ── Resolve Java 17 (always override to ensure correct version) ──
+JAVA_HOME=$(/usr/libexec/java_home -v 17 2>/dev/null || echo "")
+if [ -z "$JAVA_HOME" ] || [ ! -d "$JAVA_HOME" ]; then
+    JAVA_HOME="$HOME/Library/Java/JavaVirtualMachines/azul-17.0.13/Contents/Home"
 fi
+export JAVA_HOME
+export PATH="$JAVA_HOME/bin:$PATH"
 
 echo ""
 echo "═══════════════════════════════════════════════════════════"
