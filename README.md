@@ -1,7 +1,10 @@
 # Spring Boot Soft Delete
 
+> **[Full Documentation](https://rylxes.com/docs/spring-boot-soft-delete)** — Complete usage guide, configuration reference, and API docs.
+
 **Laravel-style soft deletes for Spring Boot JPA** — database agnostic, plug-and-play.
 
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.rylxes/spring-boot-softdelete.svg)](https://central.sonatype.com/artifact/io.github.rylxes/spring-boot-softdelete)
 [![Java 17+](https://img.shields.io/badge/java-17%2B-blue)](https://openjdk.org)
 [![Spring Boot 3.x](https://img.shields.io/badge/spring--boot-3.x-green)](https://spring.io/projects/spring-boot)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](LICENSE)
@@ -12,23 +15,25 @@
 
 ### 1. Add the dependency
 
+**Maven:**
 ```xml
 <dependency>
-    <groupId>com.github.rylxes</groupId>
+    <groupId>io.github.rylxes</groupId>
     <artifactId>spring-boot-softdelete</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
 
-Or install locally first:
-
-```bash
-mvn clean install
+**Gradle:**
+```groovy
+implementation 'io.github.rylxes:spring-boot-softdelete:1.0.0'
 ```
 
 ### 2. Make your entity soft-deletable
 
 ```java
+import com.github.rylxes.softdelete.SoftDeletableEntity;
+
 @Entity
 public class Post extends SoftDeletableEntity {
 
@@ -38,13 +43,15 @@ public class Post extends SoftDeletableEntity {
 
     private String title;
 
-    // getters, setters…
+    // getters, setters...
 }
 ```
 
 ### 3. Use the soft-delete repository
 
 ```java
+import com.github.rylxes.softdelete.SoftDeleteRepository;
+
 public interface PostRepository extends SoftDeleteRepository<Post, Long> {
 }
 ```
@@ -114,11 +121,11 @@ softdelete.column-name=removed_at
 | Method | Description | Laravel Equivalent |
 |---|---|---|
 | `softDelete(entity)` | Set `deleted_at = now()` | `$model->delete()` |
-| `softDeleteById(id)` | Same, by id | — |
+| `softDeleteById(id)` | Same, by id | -- |
 | `restore(entity)` | Clear `deleted_at` | `$model->restore()` |
-| `restoreById(id)` | Same, by id | — |
+| `restoreById(id)` | Same, by id | -- |
 | `forceDelete(entity)` | Permanent DB delete | `$model->forceDelete()` |
-| `forceDeleteById(id)` | Same, by id | — |
+| `forceDeleteById(id)` | Same, by id | -- |
 | `findAll()` | Active only (auto-filtered) | `Model::all()` |
 | `findAllWithTrashed()` | Active + deleted | `Model::withTrashed()->get()` |
 | `findByIdWithTrashed(id)` | Find including deleted | `Model::withTrashed()->find()` |
@@ -135,23 +142,19 @@ softdelete.column-name=removed_at
 1. **`SoftDeletableEntity`** is a `@MappedSuperclass` with a `deleted_at` column and a Hibernate `@FilterDef`.
 2. **`SoftDeleteFilterAspect`** (AOP) enables the Hibernate filter before every repository call, so `findAll()`, `findById()`, `count()` etc. automatically add `WHERE deleted_at IS NULL`.
 3. **`SoftDeleteRepositoryImpl`** temporarily disables the filter for `withTrashed` and `onlyTrashed` queries, then re-enables it.
-4. **Auto-configuration** wires everything when the jar is on the classpath — zero config needed.
+4. **Auto-configuration** wires everything when the jar is on the classpath -- zero config needed.
+
+### Known Limitation
+
+Spring Data JPA derived query methods (e.g., `findByCategory()`) bypass the Hibernate soft-delete filter. Use `@Query` with explicit `WHERE e.deletedAt IS NULL` conditions for custom queries that need soft-delete filtering.
 
 ---
 
-## Deploy to Maven Repo
+## Requirements
 
-```bash
-# Install locally
-mvn clean install
-
-# Deploy to a remote Maven repository (configure <distributionManagement> in pom.xml)
-mvn clean deploy
-```
-
-The POM is pre-configured with `maven-source-plugin` and `maven-javadoc-plugin` to produce `-sources.jar` and `-javadoc.jar` alongside the main artifact.
-
----
+- Java 17+
+- Spring Boot 3.x
+- Spring Data JPA
 
 ## License
 
